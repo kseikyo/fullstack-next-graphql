@@ -11,6 +11,7 @@ import {
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
+import { COOKIE_NAME } from "../contants";
 
 @InputType()
 class UsernamePasswordInput {
@@ -82,8 +83,19 @@ export class UserResolver {
       username: options.username,
       password: hashedPassword,
     });
-
+    //let user;
     try {
+      /**
+       * If anything goes wrong with this em.persistAndFlush use this ⬇⬇
+       * const result = await (em as EntityManager).createQueryBuilder(User).getKnexQuery().insert({
+       * username: options.username,
+       * password: hashedPassword,
+       * created_at: new Date(),
+       * updated_at: new Date()
+       * })
+       * .returning("*");
+       * user = result[0];
+       */
       await em.persistAndFlush(user);
     } catch (err) {
       if (err.code === "23505") {
@@ -110,6 +122,28 @@ export class UserResolver {
     @Arg("options") options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
+    if (!options.username) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "Username cannot be empty",
+          },
+        ],
+      };
+    }
+
+    if (!options.password) {
+      return {
+        errors: [
+          {
+            field: "password",
+            message: "Password cannot be empty",
+          },
+        ],
+      };
+    }
+
     const user = await em.findOne(User, { username: options.username });
 
     if (!user) {
@@ -141,5 +175,20 @@ export class UserResolver {
     return {
       user,
     };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) => {
+      req.session.destroy((err) => {
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+        res.clearCookie(COOKIE_NAME);
+        resolve(true);
+      });
+    });
   }
 }
