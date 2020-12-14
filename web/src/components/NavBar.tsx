@@ -1,14 +1,18 @@
-import { Box, Button, Flex, Link, Text } from "@chakra-ui/react";
+import { Button, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { DarkModeSwitch } from "./DarkModeSwitch";
+import { isServer } from "../utils/isServer";
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery();
+  const [{ data, fetching }] = useMeQuery({
+    pause: isServer(), // Disables server side rendering when fetching this query
+  });
+  const { colorMode } = useColorMode();
   let body = null;
 
   if (fetching) {
@@ -47,7 +51,12 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   }
 
   return (
-    <Flex justifyContent="space-between" boxShadow="lg" p={4} w="100%">
+    <Flex
+      justifyContent="space-between"
+      boxShadow={colorMode === "dark" ? "dark-lg" : "lg"}
+      p={4}
+      w="100%"
+    >
       <Flex alignItems="center" ml={4}>
         <NextLink href="/">
           <Link mr={3}>Home</Link>

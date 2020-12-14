@@ -6,9 +6,6 @@ export const DarkModeSwitch = () => {
   const isDark = colorMode === "dark";
   return (
     <IconButton
-      // position="fixed"
-      // top="1rem"
-      // right="1rem"
       aria-label="Toggle theme"
       onClick={toggleColorMode}
       icon={isDark ? <SunIcon /> : <MoonIcon />}
