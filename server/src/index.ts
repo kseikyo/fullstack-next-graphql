@@ -12,7 +12,7 @@ import cors from "cors";
 import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
-// import { MyContext } from "./types";
+
 
 const main = async () => {
   // Connect to database
