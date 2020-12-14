@@ -12,6 +12,16 @@ export const validateRegister = (options: UsernamePasswordInput) => {
     ];
   }
 
+  // Making sure the username is not an email
+  if (isEmailValid(options.email)) {
+    return [
+      {
+        field: "username",
+        message: "Username cannot be an email address",
+      },
+    ];
+  }
+
   if (options.username.length === 0) {
     return [
       {

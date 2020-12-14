@@ -11,9 +11,9 @@ import {
 } from "type-graphql";
 import argon2 from "argon2";
 import { COOKIE_NAME } from "../contants";
-import { isEmailValid } from "src/utils/isEmailValid";
+import { isEmailValid } from "../utils/isEmailValid";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
-import { validateRegister } from "src/utils/validateRegister";
+import { validateRegister } from "../utils/validateRegister";
 
 @ObjectType()
 class FieldError {
@@ -111,8 +111,8 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "username",
-            message: "Username cannot be empty",
+            field: "usernameOrEmail",
+            message: "This field cannot be empty",
           },
         ],
       };
@@ -140,8 +140,8 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "username",
-            message: "Username incorrect",
+            field: "usernameOrEmail",
+            message: "Username or email incorrect",
           },
         ],
       };
