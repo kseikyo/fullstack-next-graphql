@@ -10,10 +10,12 @@ import {
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
-import { COOKIE_NAME } from "../contants";
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
 import { isEmailValid } from "../utils/isEmailValid";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 import { validateRegister } from "../utils/validateRegister";
+import { sendEmail } from "../utils/sendEmail";
+import { v4 } from "uuid";
 
 @ObjectType()
 class FieldError {
@@ -34,9 +36,96 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string,
+    @Arg("confirmPassword") confirmPassword: string,
+    @Ctx() { redis, em, req }: MyContext
+  ): Promise<UserResponse> {
+    if (!newPassword || newPassword.length < 8) {
+      return {
+        errors: [
+          {
+            field: "newPassword",
+            message: "Password must be greater than 7 characters",
+          },
+        ],
+      };
+    }
+
+    if (newPassword !== confirmPassword) {
+      return {
+        errors: [
+          {
+            field: "confirmPassword",
+            message: "Passwords must match",
+          },
+        ],
+      };
+    }
+
+    const userId = await redis.get(FORGOT_PASSWORD_PREFIX + token);
+
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "token expired",
+          },
+        ],
+      };
+    }
+
+    const user = await em.findOne(User, { id: parseInt(userId) });
+
+    // Shouldnt fall for this case, but checking anyway
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "User no longer exists",
+          },
+        ],
+      };
+    }
+
+    user.password = await argon2.hash(newPassword);
+
+    await em.persistAndFlush(user);
+
+    // Log in user after change password
+    req.session.userId = user.id;
+
+    return { user };
+  }
+
   @Mutation(() => Boolean)
-  async forgotPassword(@Arg("email") email: string, @Ctx() { em }: MyContext) {
-    // const user = await em.findOne(User, { email });
+  async forgotPassword(
+    @Arg("email") email: string,
+    @Ctx() { em, redis }: MyContext
+  ) {
+    const user = await em.findOne(User, { email });
+    if (!user) {
+      // the user is not registered
+      // do nothing
+      return true;
+    }
+    // Generate uuid token
+    const token = v4();
+    // Set the key as the token with prefix, the value being the user id
+    // And the expiration date to three days
+    await redis.set(
+      FORGOT_PASSWORD_PREFIX + token,
+      user.id,
+      "ex",
+      1000 * 60 * 60 * 24 * 3
+    );
+
+    const body = `<a href="http://localhost:3000/change-password/${token}" >Reset password</a>`;
+    await sendEmail(email, body);
     return true;
   }
 
@@ -117,12 +206,12 @@ export class UserResolver {
         ],
       };
     }
-    if (!password) {
+    if (!password || password.length < 8) {
       return {
         errors: [
           {
             field: "password",
-            message: "Password cannot be empty",
+            message: "Password must be greater than 7 characters",
           },
         ],
       };
