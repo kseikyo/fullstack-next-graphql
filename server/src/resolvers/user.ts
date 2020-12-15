@@ -16,6 +16,7 @@ import { UsernamePasswordInput } from "./UsernamePasswordInput";
 import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
+import { getConnection } from "typeorm";
 
 @ObjectType()
 class FieldError {
@@ -41,7 +42,7 @@ export class UserResolver {
     @Arg("token") token: string,
     @Arg("newPassword") newPassword: string,
     @Arg("confirmPassword") confirmPassword: string,
-    @Ctx() { redis, em, req }: MyContext
+    @Ctx() { redis, req }: MyContext
   ): Promise<UserResponse> {
     if (!newPassword || newPassword.length < 8) {
       return {
@@ -78,7 +79,8 @@ export class UserResolver {
       };
     }
 
-    const user = await em.findOne(User, { id: parseInt(userId) });
+    const userIdNum = parseInt(userId);
+    const user = await User.findOne(userIdNum);
 
     // Shouldnt fall for this case, but checking anyway
     if (!user) {
@@ -92,9 +94,12 @@ export class UserResolver {
       };
     }
 
-    user.password = await argon2.hash(newPassword);
-
-    await em.persistAndFlush(user);
+    await User.update(
+      { id: userIdNum },
+      {
+        password: await argon2.hash(newPassword),
+      }
+    );
 
     // Log in user after change password
     req.session.userId = user.id;
@@ -105,9 +110,9 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { em, redis }: MyContext
+    @Ctx() { redis }: MyContext
   ) {
-    const user = await em.findOne(User, { email });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       // the user is not registered
       // do nothing
@@ -130,20 +135,19 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req, em }: MyContext) {
+  me(@Ctx() { req }: MyContext) {
     const id = req.session.userId;
     // User not logged in
     if (!id) {
       return null;
     }
-    const user = await em.findOne(User, { id });
-    return user;
+    return User.findOne(id);
   }
 
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options);
     if (errors) {
@@ -151,25 +155,21 @@ export class UserResolver {
     }
 
     const hashedPassword = await argon2.hash(options.password);
-    const user = em.create(User, {
-      username: options.username,
-      email: options.email,
-      password: hashedPassword,
-    });
-    //let user;
+    let user;
     try {
-      /**
-       * If anything goes wrong with this em.persistAndFlush use this ⬇⬇
-       * const result = await (em as EntityManager).createQueryBuilder(User).getKnexQuery().insert({
-       * username: options.username,
-       * password: hashedPassword,
-       * created_at: new Date(),
-       * updated_at: new Date()
-       * })
-       * .returning("*");
-       * user = result[0];
-       */
-      await em.persistAndFlush(user);
+      const result = await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          username: options.username,
+          email: options.email,
+          password: hashedPassword,
+        })
+        .returning("*")
+        .execute();
+
+      user = result.raw[0];
     } catch (err) {
       if (err.code === "23505") {
         return {
@@ -194,7 +194,7 @@ export class UserResolver {
   async login(
     @Arg("usernameOrEmail") usernameOrEmail: string,
     @Arg("password") password: string,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     if (!usernameOrEmail) {
       return {
@@ -206,23 +206,14 @@ export class UserResolver {
         ],
       };
     }
-    if (!password || password.length < 8) {
-      return {
-        errors: [
-          {
-            field: "password",
-            message: "Password must be greater than 7 characters",
-          },
-        ],
-      };
-    }
     const isEmail = isEmailValid(usernameOrEmail);
 
     // If field is not a valid email, use it as username
     // else, use it as email
-    const user = await em.findOne(
-      User,
-      !isEmail ? { username: usernameOrEmail } : { email: usernameOrEmail }
+    const user = await User.findOne(
+      !isEmail
+        ? { where: { username: usernameOrEmail } }
+        : { where: { email: usernameOrEmail } }
     );
 
     if (!user) {

@@ -13,7 +13,7 @@ export const validateRegister = (options: UsernamePasswordInput) => {
   }
 
   // Making sure the username is not an email
-  if (isEmailValid(options.email)) {
+  if (isEmailValid(options.username)) {
     return [
       {
         field: "username",
@@ -31,11 +31,11 @@ export const validateRegister = (options: UsernamePasswordInput) => {
     ];
   }
 
-  if (options.password.length === 0) {
+  if (!options.password || options.password.length < 8) {
     return [
       {
         field: "password",
-        message: "Password cannot be empty",
+        message: "Password must be greater than 7 characters",
       },
     ];
   }
