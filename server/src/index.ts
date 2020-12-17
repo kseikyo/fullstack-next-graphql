@@ -12,19 +12,21 @@ import session from "express-session";
 import connectRedis from "connect-redis";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import path from "path";
 
 const main = async () => {
   // Connect to database
-  await createConnection({
+  const conn = await createConnection({
     type: "postgres",
     database: "lireddit2",
     username: "postgres",
     password: "VAPihhxNS8YcnnAMWeXokmF9eceBgyUpiJe2vXG8",
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User],
   });
-
+  await conn.runMigrations();
   const app = express();
 
   // Redis connection

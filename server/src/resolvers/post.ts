@@ -8,9 +8,11 @@ import {
   Field,
   Ctx,
   UseMiddleware,
+  Int,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
+import { getConnection } from "typeorm";
 
 @InputType()
 class PostInput {
@@ -23,8 +25,34 @@ class PostInput {
 @Resolver(Post)
 export class PostResolver {
   @Query(() => [Post])
-  posts(): Promise<Post[]> {
-    return Post.find();
+  posts(
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+  ): Promise<Post[]> {
+    // Limiting the results to 50
+    const realLimit = Math.min(50, limit);
+
+    /**
+     * Creating the sql
+     * Get latest posts, ordered by createdAt DESCENDING
+     * take (or limit) by the realLimit
+     * and query based on the cursor (which is a timestamp) if it is available
+     * returning many posts
+     * */
+
+    const qb = getConnection()
+      .getRepository(Post)
+      .createQueryBuilder("p")
+      .orderBy('"createdAt"', "DESC")
+      .take(realLimit);
+
+    if (cursor) {
+      qb.where('"createdAt" < :cursor', {
+        cursor: new Date(parseInt(cursor)),
+      });
+    }
+
+    return qb.getMany();
   }
 
   @Query(() => Post, { nullable: true })
