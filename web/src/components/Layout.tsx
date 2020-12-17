@@ -2,9 +2,7 @@ import React from "react";
 import { Container } from "./Container";
 import { NavBar } from "./NavBar";
 
-interface MainProps {}
-
-export const Main: React.FC<MainProps> = ({children}) => {
+export const Layout: React.FC<{}> = ({children}) => {
   return (
     <Container height="100vh">
       <NavBar />

@@ -6,7 +6,7 @@ import { InputField } from "../components/InputField";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import { Main } from "../components/Main";
+import { Layout } from "../components/Layout";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
@@ -17,7 +17,7 @@ const Login: React.FC<loginProps> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
-    <Main>
+    <Layout>
       <Wrapper variant="small">
         <Formik
           initialValues={{ usernameOrEmail: "", password: "" }}
@@ -27,7 +27,11 @@ const Login: React.FC<loginProps> = ({}) => {
               setErrors(toErrorMap(response.data.login.errors));
             } else if (response.data?.login.user) {
               // User logged in successfully, redirecting...
-              router.push("/");
+              if (typeof router.query.next === "string") {
+                router.replace(router.query.next);
+              } else {
+                router.push("/");
+              }
             }
           }}
         >
@@ -55,14 +59,14 @@ const Login: React.FC<loginProps> = ({}) => {
                   Sign in
                 </Button>
                 <NextLink href="/forgot-password">
-                  <Link >Forgot password?</Link>
+                  <Link>Forgot password?</Link>
                 </NextLink>
               </Flex>
             </Form>
           )}
         </Formik>
       </Wrapper>
-    </Main>
+    </Layout>
   );
 };
 

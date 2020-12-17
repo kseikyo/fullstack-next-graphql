@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import { InputField } from "../components/InputField";
-import { Main } from "../components/Main";
+import { Layout } from "../components/Layout";
 import { Wrapper } from "../components/Wrapper";
 import { useForgotPasswordMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -15,7 +15,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
   const toast = useToast();
   const router = useRouter();
   return (
-    <Main>
+    <Layout>
       {complete &&
         toast({
           title: "Request sent successfully",
@@ -57,7 +57,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
           )}
         </Formik>
       </Wrapper>
-    </Main>
+    </Layout>
   );
 };
 

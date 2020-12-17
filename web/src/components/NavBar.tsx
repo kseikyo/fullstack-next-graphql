@@ -33,19 +33,23 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     //user is logged in
     body = (
       <Flex mr={4}>
-        <Text mr={4} display="inline-block">
-          {data.me.username}
-        </Text>
+        <NextLink href="/create-post">
+          <Link mr={4}>Create post</Link>
+        </NextLink>
         <Button
-          mb={1}
+          mr={4}
           variant="link"
           onClick={() => {
             logout();
           }}
           isLoading={logoutFetching}
+          fontWeight="normal"
         >
           Logout
         </Button>
+        <Text mr={4} display="inline-block">
+          {data.me.username}
+        </Text>
       </Flex>
     );
   }

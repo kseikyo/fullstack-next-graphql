@@ -6,7 +6,7 @@ import { InputField } from "../components/InputField";
 import { useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
-import { Main } from "../components/Main";
+import { Layout } from "../components/Layout";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
@@ -16,7 +16,7 @@ const Register: React.FC<registerProps> = ({}) => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
   return (
-    <Main>
+    <Layout>
       <Wrapper variant="small">
         <Formik
           initialValues={{ email: "", username: "", password: "" }}
@@ -65,7 +65,7 @@ const Register: React.FC<registerProps> = ({}) => {
           )}
         </Formik>
       </Wrapper>
-    </Main>
+    </Layout>
   );
 };
 

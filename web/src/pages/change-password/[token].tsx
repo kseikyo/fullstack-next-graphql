@@ -4,7 +4,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { InputField } from "../../components/InputField";
-import { Main } from "../../components/Main";
+import { Layout } from "../../components/Layout";
 import { Wrapper } from "../../components/Wrapper";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { toErrorMap } from "../../utils/toErrorMap";
@@ -19,7 +19,7 @@ const ChangePassword: NextPage = () => {
   const toast = useToast();
 
   return (
-    <Main>
+    <Layout>
       {tokenError &&
         toast({
           title: "An error occured.",
@@ -28,7 +28,9 @@ const ChangePassword: NextPage = () => {
           duration: 6000,
           isClosable: true,
           position: "top",
-          onCloseComplete: () => {router.push("/forgot-password");}
+          onCloseComplete: () => {
+            router.push("/forgot-password");
+          },
         })}
       <Wrapper variant="small">
         <Formik
@@ -85,14 +87,8 @@ const ChangePassword: NextPage = () => {
           )}
         </Formik>
       </Wrapper>
-    </Main>
+    </Layout>
   );
-};
-
-ChangePassword.getInitialProps = ({ query }) => {
-  return {
-    token: query.token as string,
-  };
 };
 
 export default withUrqlClient(createUrqlClient)(ChangePassword);
