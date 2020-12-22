@@ -4,7 +4,7 @@ import { Container } from "./Container";
 import { NavBar } from "./NavBar";
 
 interface LayoutProps {
-  maxHeight?: "auto" | "100vh";
+  maxHeight?: "auto" | "100vh" | "90.9vh";
   height?: "auto" | "100%";
   overflow?: "hidden" | "auto";
 }

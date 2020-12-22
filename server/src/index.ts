@@ -14,6 +14,7 @@ import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import path from "path";
 
+
 const main = async () => {
   // Connect to database
   const conn = await createConnection({
@@ -26,6 +27,8 @@ const main = async () => {
     migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User],
   });
+  // When in need to reset posts data
+  // await Post.delete({});
   await conn.runMigrations();
   const app = express();
 
