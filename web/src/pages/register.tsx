@@ -16,7 +16,7 @@ const Register: React.FC<registerProps> = ({}) => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
   return (
-    <Layout>
+    <Layout maxHeight="100vh" height="100%" overflow="hidden">
       <Wrapper variant="small">
         <Formik
           initialValues={{ email: "", username: "", password: "" }}

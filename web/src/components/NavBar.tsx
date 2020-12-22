@@ -1,18 +1,33 @@
-import { Button, Flex, Link, Text, useColorMode } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Link,
+  Text,
+  useColorMode,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
-import { DarkModeSwitch } from "./DarkModeSwitch";
 import { isServer } from "../utils/isServer";
+import { SunIcon, MoonIcon } from "@chakra-ui/icons";
 
-interface NavBarProps {}
+interface NavBarProps {
+  bg?: string;
+  color?: string;
+}
 
-export const NavBar: React.FC<NavBarProps> = ({}) => {
+export const NavBar: React.FC<NavBarProps> = ({ bg, color }) => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(), // Disables server side rendering when fetching this query
   });
-  const { colorMode } = useColorMode();
+  const { toggleColorMode: toggleMode } = useColorMode();
+  const text = useColorModeValue("dark", "light");
+
+  const SwitchIcon = useColorModeValue(MoonIcon, SunIcon);
   let body = null;
 
   if (fetching) {
@@ -20,19 +35,19 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else if (!data?.me) {
     //user is not logged in
     body = (
-      <Flex mr={4}>
+      <HStack mr={4} alignItems="start">
         <NextLink href="/login">
-          <Link mr={3}>Sign in</Link>
+          <Link mr={4}>Sign in</Link>
         </NextLink>
         <NextLink href="/register">
           <Link>Sign up</Link>
         </NextLink>
-      </Flex>
+      </HStack>
     );
   } else {
     //user is logged in
     body = (
-      <Flex mr={4}>
+      <HStack mr={4}>
         <NextLink href="/create-post">
           <Link mr={4}>Create post</Link>
         </NextLink>
@@ -47,29 +62,38 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         >
           Logout
         </Button>
-        <Text mr={4} display="inline-block">
-          {data.me.username}
-        </Text>
-      </Flex>
+        <Text display="inline-block">{data.me.username}</Text>
+      </HStack>
     );
   }
-
   return (
     <Flex
       justifyContent="space-between"
-      boxShadow={colorMode === "dark" ? "dark-lg" : "lg"}
-      p={4}
-      w="100%"
+      boxShadow={text === "dark" ? "lg" : "dark-lg"}
+      p={6}
+      // height="full"
+      // position="fixed"
+      // left={0}
+      // flexDirection="column"
+      position="sticky"
+      top={0}
+      color={color}
+      bg={bg}
     >
-      <Flex alignItems="center" ml={4}>
+      <Flex justifyContent="center">
         <NextLink href="/">
-          <Link mr={3}>Home</Link>
+          <Link mt={3}>LiReddit</Link>
         </NextLink>
       </Flex>
-      <Flex alignItems="center">
+      <HStack>
         {body}
-        <DarkModeSwitch />
-      </Flex>
+        <IconButton
+          aria-label={`Switch to ${text} mode`}
+          variant="ghost"
+          onClick={toggleMode}
+          icon={<SwitchIcon />}
+        />
+      </HStack>
     </Flex>
   );
 };

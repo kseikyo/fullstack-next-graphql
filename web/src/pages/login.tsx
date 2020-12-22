@@ -17,7 +17,7 @@ const Login: React.FC<loginProps> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
-    <Layout>
+    <Layout maxHeight="100vh" height="100%" overflow="hidden">
       <Wrapper variant="small">
         <Formik
           initialValues={{ usernameOrEmail: "", password: "" }}
