@@ -71,10 +71,7 @@ export const NavBar: React.FC<NavBarProps> = ({ bg, color }) => {
       justifyContent="space-between"
       boxShadow={text === "dark" ? "lg" : "dark-lg"}
       p={6}
-      // height="full"
-      // position="fixed"
-      // left={0}
-      // flexDirection="column"
+      zIndex={1}
       position="sticky"
       top={0}
       color={color}

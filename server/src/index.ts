@@ -13,7 +13,7 @@ import connectRedis from "connect-redis";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import path from "path";
-
+import { Updoot } from "./entities/Updoot";
 
 const main = async () => {
   // Connect to database
@@ -25,7 +25,7 @@ const main = async () => {
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
-    entities: [Post, User],
+    entities: [Post, User, Updoot],
   });
   // When in need to reset posts data
   // await Post.delete({});

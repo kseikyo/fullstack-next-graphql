@@ -1,21 +1,24 @@
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
   Grid,
   Heading,
+  IconButton,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import { Layout } from "../components/Layout";
+import { UpdootSection } from "../components/UpdootSection";
 import { Wrapper } from "../components/Wrapper";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 const Index = () => {
   const [variables, setVariables] = useState({
-    limit: 10,
+    limit: 15,
     cursor: null as string | null,
   });
   const [{ data, fetching }] = usePostsQuery({
@@ -50,10 +53,20 @@ const Index = () => {
         <Stack spacing={8}>
           {data!.posts.posts.map((post) => {
             return (
-              <Box key={post.id} p={5} shadow="md" borderWidth="1px">
-                <Heading fontSize="xl">{post.title}</Heading>
-                <Text mt={4}>{post.textSnippet}</Text>
-              </Box>
+              <Flex
+                key={post.id}
+                style={{ gap: "1rem" }}
+                p={5}
+                shadow="lg"
+                borderWidth="2px"
+              >
+                <UpdootSection post={post} />
+                <Box>
+                  <Heading fontSize="xl">{post.title}</Heading>
+                  <Text>Posted by: {post.creator.username}</Text>
+                  <Text mt={4}>{post.textSnippet}</Text>
+                </Box>
+              </Flex>
             );
           })}
         </Stack>

@@ -16,7 +16,7 @@ const CreatePost: React.FC<{}> = ({}) => {
 
   useIsAuth();
   return (
-    <Layout>
+    <Layout maxHeight="100vh" height="100%" overflow="hidden">
       <Wrapper variant="small">
         <Formik
           initialValues={{ title: "", text: "" }}
