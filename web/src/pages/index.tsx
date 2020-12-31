@@ -1,21 +1,22 @@
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
   Grid,
   Heading,
-  IconButton,
   Stack,
   Text,
+  Link,
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 import React, { useState } from "react";
+import EditDeletePostButtons from "../components/EditDeletePostButtons";
 import { Layout } from "../components/Layout";
 import { UpdootSection } from "../components/UpdootSection";
-import { Wrapper } from "../components/Wrapper";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+
 const Index = () => {
   const [variables, setVariables] = useState({
     limit: 15,
@@ -49,28 +50,42 @@ const Index = () => {
 
   return (
     <Layout>
-      <Wrapper variant="regular">
-        <Stack spacing={8}>
-          {data!.posts.posts.map((post) => {
-            return (
-              <Flex
-                key={post.id}
-                style={{ gap: "1rem" }}
-                p={5}
-                shadow="lg"
-                borderWidth="2px"
-              >
-                <UpdootSection post={post} />
-                <Box>
-                  <Heading fontSize="xl">{post.title}</Heading>
-                  <Text>Posted by: {post.creator.username}</Text>
-                  <Text mt={4}>{post.textSnippet}</Text>
-                </Box>
-              </Flex>
-            );
-          })}
-        </Stack>
-      </Wrapper>
+      <Stack spacing={8}>
+        {data!.posts.posts.map((post) => {
+          return !post ? null : (
+            <Flex
+              key={post.id}
+              style={{ gap: "1rem" }}
+              p={5}
+              shadow="md"
+              borderWidth="2px"
+            >
+              <UpdootSection post={post} />
+              <Box flex={1}>
+                <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{post.title}</Heading>
+                  </Link>
+                </NextLink>
+                <Text>Posted by: {post.creator.username}</Text>
+                <Flex align="center">
+                  <Text flex={1} mt={4}>
+                    {post.textSnippet}
+                  </Text>
+
+                  <Flex ml="auto" justifyContent="space-between">
+                    <EditDeletePostButtons
+                      id={post.id}
+                      title={post.title}
+                      creatorId={post.creator.id}
+                    />
+                  </Flex>
+                </Flex>
+              </Box>
+            </Flex>
+          );
+        })}
+      </Stack>
       {data && data.posts.hasMore && (
         <Flex justifyContent="center">
           <Button

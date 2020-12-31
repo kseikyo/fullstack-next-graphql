@@ -4,7 +4,6 @@ import { withUrqlClient } from "next-urql";
 import React, { useState } from "react";
 import { InputField } from "../components/InputField";
 import { Layout } from "../components/Layout";
-import { Wrapper } from "../components/Wrapper";
 import { useForgotPasswordMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { useRouter } from "next/router";
@@ -15,7 +14,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
   const toast = useToast();
   const router = useRouter();
   return (
-    <Layout>
+    <Layout wrapperVariant="small">
       {complete &&
         toast({
           title: "Request sent successfully",
@@ -29,34 +28,28 @@ const ForgotPassword: React.FC<{}> = ({}) => {
             router.push("/");
           },
         })}
-      <Wrapper variant="small">
-        <Formik
-          initialValues={{ email: "" }}
-          onSubmit={async (values) => {
-            await forgotPassword(values);
-            setComplete(true);
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <InputField
-                name="email"
-                label="Email"
-                type="email"
-              />
+      <Formik
+        initialValues={{ email: "" }}
+        onSubmit={async (values) => {
+          await forgotPassword(values);
+          setComplete(true);
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField name="email" label="Email" type="email" />
 
-              <Button
-                mt={4}
-                type="submit"
-                isLoading={isSubmitting}
-                colorScheme="teal"
-              >
-                Send
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
+            <Button
+              mt={4}
+              type="submit"
+              isLoading={isSubmitting}
+              colorScheme="teal"
+            >
+              Send
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Layout>
   );
 };

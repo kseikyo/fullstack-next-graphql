@@ -27,6 +27,7 @@ const main = async () => {
     migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User, Updoot],
   });
+
   // When in need to reset posts data
   // await Post.delete({});
   await conn.runMigrations();

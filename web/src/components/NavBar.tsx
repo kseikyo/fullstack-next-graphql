@@ -1,6 +1,7 @@
 import {
   Button,
   Flex,
+  Heading,
   HStack,
   IconButton,
   Link,
@@ -47,7 +48,7 @@ export const NavBar: React.FC<NavBarProps> = ({ bg, color }) => {
   } else {
     //user is logged in
     body = (
-      <HStack mr={4}>
+      <HStack>
         <NextLink href="/create-post">
           <Link mr={4}>Create post</Link>
         </NextLink>
@@ -68,8 +69,8 @@ export const NavBar: React.FC<NavBarProps> = ({ bg, color }) => {
   }
   return (
     <Flex
-      justifyContent="space-between"
-      boxShadow={text === "dark" ? "lg" : "dark-lg"}
+      // when text is dark, the theme is light
+      boxShadow={text === "dark" ? "md" : "dark-lg"}
       p={6}
       zIndex={1}
       position="sticky"
@@ -77,20 +78,28 @@ export const NavBar: React.FC<NavBarProps> = ({ bg, color }) => {
       color={color}
       bg={bg}
     >
-      <Flex justifyContent="center">
+      <Flex
+        flex={1}
+        align="center"
+        maxW={800 * 0.8} //80% of 800 as the wrapper is 800px and the content uses 80% of it
+        m="auto"
+        justifyContent="space-between"
+      >
         <NextLink href="/">
-          <Link mt={3}>LiReddit</Link>
+          <Link>
+            <Heading as="h2">LiReddit</Heading>
+          </Link>
         </NextLink>
+        <HStack>
+          {body}
+          <IconButton
+            aria-label={`Switch to ${text} mode`}
+            variant="ghost"
+            onClick={toggleMode}
+            icon={<SwitchIcon />}
+          />
+        </HStack>
       </Flex>
-      <HStack>
-        {body}
-        <IconButton
-          aria-label={`Switch to ${text} mode`}
-          variant="ghost"
-          onClick={toggleMode}
-          icon={<SwitchIcon />}
-        />
-      </HStack>
     </Flex>
   );
 };

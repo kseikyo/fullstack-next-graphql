@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "removeComments": true,
     "noImplicitAny": true,

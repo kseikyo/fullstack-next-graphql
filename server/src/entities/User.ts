@@ -18,10 +18,14 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToMany(() => Post, post => post.creator)
+  @OneToMany(() => Post, post => post.creator, {
+    // onDelete: "CASCADE"
+  })
   posts: Post[];
 
-  @OneToMany(() => Updoot, updoot => updoot.user)
+  @OneToMany(() => Updoot, updoot => updoot.user, {
+    // onDelete: "CASCADE"
+  })
   updoots: Updoot[];
 
   @Field()

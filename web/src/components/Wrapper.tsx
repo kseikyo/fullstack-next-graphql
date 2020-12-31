@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 
 interface WrapperProps {
@@ -10,13 +10,16 @@ export const Wrapper: React.FC<WrapperProps> = ({
   variant = "regular",
 }) => {
   return (
-    <Box
-      mt={8}
+    <Flex
+      my={8}
       mx="auto"
       maxW={variant === "regular" ? "800px" : "400px"}
       w="100%"
+      justifyContent="center"
     >
-      {children}
-    </Box>
+      <Box w="80%">
+        {children}
+      </Box>
+    </Flex>
   );
 };

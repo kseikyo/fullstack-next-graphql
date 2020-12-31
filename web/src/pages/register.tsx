@@ -16,55 +16,58 @@ const Register: React.FC<registerProps> = ({}) => {
   const router = useRouter();
   const [, register] = useRegisterMutation();
   return (
-    <Layout maxHeight="100vh" height="100%" overflow="hidden">
-      <Wrapper variant="small">
-        <Formik
-          initialValues={{ email: "", username: "", password: "" }}
-          onSubmit={async (values, { setErrors }) => {
-            const response = await register({ options: values });
-            if (response.data?.register.errors) {
-              setErrors(toErrorMap(response.data.register.errors));
-            } else if (response.data?.register.user) {
-              // User created successfully, redirecting...
-              router.push("/");
-            }
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
+    <Layout
+      wrapperVariant="small"
+      maxHeight="100vh"
+      height="100%"
+      overflow="hidden"
+    >
+      <Formik
+        initialValues={{ email: "", username: "", password: "" }}
+        onSubmit={async (values, { setErrors }) => {
+          const response = await register({ options: values });
+          if (response.data?.register.errors) {
+            setErrors(toErrorMap(response.data.register.errors));
+          } else if (response.data?.register.user) {
+            // User created successfully, redirecting...
+            router.push("/");
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <InputField
+              name="username"
+              placeholder="username"
+              label="Username"
+            />
+            <Box mt={4}>
               <InputField
-                name="username"
-                placeholder="username"
-                label="Username"
+                name="email"
+                placeholder="email"
+                label="Email"
+                type="email"
               />
-              <Box mt={4}>
-                <InputField
-                  name="email"
-                  placeholder="email"
-                  label="Email"
-                  type="email"
-                />
-              </Box>
-              <Box mt={4}>
-                <InputField
-                  name="password"
-                  placeholder="password"
-                  label="Password"
-                  type="password"
-                />
-              </Box>
-              <Button
-                mt={4}
-                type="submit"
-                isLoading={isSubmitting}
-                colorScheme="teal"
-              >
-                Sign up
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
+            </Box>
+            <Box mt={4}>
+              <InputField
+                name="password"
+                placeholder="password"
+                label="Password"
+                type="password"
+              />
+            </Box>
+            <Button
+              mt={4}
+              type="submit"
+              isLoading={isSubmitting}
+              colorScheme="teal"
+            >
+              Sign up
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Layout>
   );
 };
