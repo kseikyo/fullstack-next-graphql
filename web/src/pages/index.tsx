@@ -7,6 +7,7 @@ import {
   Stack,
   Text,
   Link,
+  Skeleton,
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
@@ -18,14 +19,42 @@ import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
+  // const [loading, setLoading] = useState(true);
   const [variables, setVariables] = useState({
     limit: 15,
     cursor: null as string | null,
   });
+
   const [{ data, fetching }] = usePostsQuery({
     variables,
   });
 
+  if (!data && fetching) {
+    return (
+      <Layout>
+        <Stack spacing={8}>
+          {Array(6).fill(0).map((_, idx) => {
+            return (
+              <Flex
+                key={idx}
+                style={{ gap: ".75rem" }}
+                flexDir="column"
+                p={5}
+                shadow="md"
+                borderWidth="2px"
+              >
+                <Skeleton h={6} w="40%" />
+                <Skeleton h={3} />
+                <Skeleton h={3} />
+                <Skeleton h={3} />
+                <Skeleton h={3} />
+              </Flex>
+            );
+          })}
+        </Stack>
+      </Layout>
+    );
+  }
   if (!data) {
     return (
       <Layout maxHeight="90.9vh" height="100%">
@@ -52,6 +81,7 @@ const Index = () => {
     <Layout>
       <Stack spacing={8}>
         {data!.posts.posts.map((post) => {
+          // post may be null after removal
           return !post ? null : (
             <Flex
               key={post.id}
