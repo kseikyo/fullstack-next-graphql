@@ -37,15 +37,9 @@
 
 ## LiReddit is a [Reddit](https://www.reddit.com) clone focusing on the functionality. 
 
-</br>
+This project contains a Next frontend, using URQL to do Server Side Rendering on certain pages, as well as request caching. For a better developer experience, its used graphql-codegen to generate hooks for the queries and mutations, while for great UI/UX, Chakra UI is used.
 
-### This project contains a Next frontend, using URQL to do Server Side Rendering on certain pages, as well as request caching. For a better developer experience, its used graphql-codegen to generate hooks for the queries and mutations, while for great UI/UX, Chakra UI is used.
-
-</br>
-
-### On the server, it features a GraphQL API using TypeGraphQL for the schema creation, Apollo Server for data-fetching and resolver development, redis to store the session cookie, nodemailer to send automatic emails, TypeORM as a query builder and general database interactions and dataloader for batching and caching data-fetching requests.
-
-</br>
+On the server, it features a GraphQL API using TypeGraphQL for the schema creation, Apollo Server for data-fetching and resolver development, redis to store the session cookie, nodemailer to send automatic emails, TypeORM as a query builder and general database interactions and dataloader for batching and caching data-fetching requests.
 
 
 ## 💻 Technologies
